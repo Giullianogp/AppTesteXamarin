@@ -7,40 +7,48 @@ using System.Threading.Tasks;
 using Microsoft.WindowsAzure.MobileServices;
 using Microsoft.WindowsAzure.MobileServices.SQLiteStore;
 using Microsoft.WindowsAzure.MobileServices.Sync;
+using Newtonsoft.Json.Linq;
+using System.Net.Http;
 
 namespace AppTesteXamarin.Model
 {
     public class AzureDataService
     {
         public MobileServiceClient MobileService { get; set; }
-        IMobileServiceSyncTable bookTable;
-
+        IMobileServiceSyncTable<Book> bookTable;
+        bool isInitialized;
         public async Task Initialize()
         {
+            if (isInitialized)
+                return;
+
             MobileService = new MobileServiceClient("http://apptestexamarin.azurewebsites.net/");
 
-            const string path = "syncstore.db";
+            const string path = "synBook3.db";
             var store = new MobileServiceSQLiteStore(path);
-            store.DefineTable(); 
+            store.DefineTable<Book>();
             await MobileService.SyncContext.InitializeAsync(store, new MobileServiceSyncHandler());
 
             //Get our sync table that will call out to azure
-            bookTable = MobileService.GetSyncTable();
+            bookTable = MobileService.GetSyncTable<Book>();
+
+            isInitialized = true;
 
         }
 
-        public async Task<IEnumerable> GetBooks()
+        public async Task<IEnumerable<Book>> GetBooks()
         {
+            await Initialize();
             await SyncBook();
-            return await bookTable.OrderBy(c => c.DateUtc).ToEnumerableAsync();
+            return await bookTable.OrderBy(c => c.Name).ToEnumerableAsync();
         }
 
-        public async Task AddBook(bool madeAtHome)
+        public async Task<Book> AddBook(string name)
         {
-            var book = new Book
+            await Initialize();
+            var book = new Book()
             {
-                DateUtc = DateTime.UtcNow,
-                MadeAtHome = madeAtHome
+                Name = name
             };
 
             await bookTable.InsertAsync(book);
@@ -48,13 +56,14 @@ namespace AppTesteXamarin.Model
             //Synchronize coffee
             await SyncBook();
 
+            return book;
+
         }
 
         public async Task SyncBook()
         {
-            await bookTable.PullAsync("allBooks", bookTable);
+            await bookTable.PullAsync("allBooks", bookTable.CreateQuery());
             await MobileService.SyncContext.PushAsync();
-
         }
 
     }

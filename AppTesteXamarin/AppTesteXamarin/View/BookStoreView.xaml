@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="AppTesteXamarin.View.BookStoreView">
+
+  <StackLayout VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand" BackgroundColor="White">
+    <Label Text="Book List" FontSize="20" HorizontalOptions="Center" TextColor="Black"/>
+    <StackLayout Orientation="Horizontal" BackgroundColor="#2980b9">
+      
+      <Entry Text="{Binding Nome}" WidthRequest="250"/>
+      <Button Text="Add" Command="{Binding AddBookCommand}"/>
+
+    </StackLayout>
+    <ActivityIndicator IsRunning="True" IsVisible="{Binding loading}"/>
+    <ListView VerticalOptions="FillAndExpand"
+              SeparatorVisibility="None"
+              ItemsSource="{Binding Books}">
+
+      <ListView.ItemTemplate>
+        <DataTemplate>
+          <ViewCell>
+            <StackLayout Orientation="Horizontal" Padding="10,0,0,0">
+              <Label Text="{Binding Name}"
+                     TextColor="Black"
+                     VerticalOptions="Center"
+                     VerticalTextAlignment="Center"/>
+            </StackLayout>
+          </ViewCell>
+        </DataTemplate>
+      </ListView.ItemTemplate>
+    </ListView>
+
+  </StackLayout>
+
+
+</ContentPage>

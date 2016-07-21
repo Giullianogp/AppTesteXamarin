@@ -13,15 +13,8 @@ namespace AppTesteXamarin.Model
 
         [Microsoft.WindowsAzure.MobileServices.Version]
         public string AzureVersion { get; set; }
-
-        public DateTime DateUtc { get; set; }
-        public bool MadeAtHome { get; set; }
-
-        [Newtonsoft.Json.JsonIgnore]
-        public string DateDisplay { get { return DateUtc.ToLocalTime().ToString("d"); } }
-
-        [Newtonsoft.Json.JsonIgnore]
-        public string TimeDisplay { get { return DateUtc.ToLocalTime().ToString("t"); } }
+        
+        public string Name { get; set; }
 
     }
 }
